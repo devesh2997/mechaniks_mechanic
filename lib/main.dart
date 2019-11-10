@@ -9,6 +9,8 @@ import 'package:mechaniks_mechanic/screens/login_page.dart';
 import 'package:mechaniks_mechanic/screens/offline_page.dart';
 import 'package:mechaniks_mechanic/widgets/with_authentication.dart';
 
+import 'data/tickets_repository.dart';
+
 void main() {
   runApp(
     MultiProvider(
@@ -16,6 +18,9 @@ void main() {
         ChangeNotifierProvider(
           builder: (context) => UserRepository.instance(),
         ),
+        ChangeNotifierProvider(
+          builder: (context) => TicketsRepository.instance(),
+        )
       ],
       child: MyApp(),
     ),

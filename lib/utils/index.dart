@@ -1,4 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:mechaniks_mechanic/models/ticket.dart';
+
+String _getAddressPart(String part, {bool comma = true}) {
+  if (part == null || part.length == 0) return "";
+  if (comma) {
+    return part + ', ';
+  } else {
+    return part;
+  }
+}
+
+String placemarkAddress(Placemark placemark) {
+  String add = "";
+  add += _getAddressPart(placemark.name);
+  add += _getAddressPart(placemark.subThoroughfare);
+  if(placemark.subThoroughfare!=placemark.thoroughfare)add += _getAddressPart(placemark.thoroughfare);
+  add += _getAddressPart(placemark.subLocality);
+  if(placemark.subLocality!=placemark.locality)add += _getAddressPart(placemark.locality);
+  add += _getAddressPart(placemark.subAdministrativeArea);
+  if(placemark.subAdministrativeArea!=placemark.administrativeArea)add += _getAddressPart(placemark.administrativeArea);
+  add += _getAddressPart(placemark.postalCode, comma: false);
+  return add;
+}
+
+Future<String> getAddressFromGeoFirePoint(GeoFirePoint point) async {
+  try {
+    List<Placemark> placemarks =
+        await Geolocator().placemarkFromCoordinates(point.latitude, point.longitude);
+    return placemarkAddress(placemarks[0]);
+  } on Exception catch (e) {
+    print(e);
+    return "";
+  }
+}
 
 String monthIntToString(int m) {
   switch (m) {
@@ -29,6 +65,18 @@ String monthIntToString(int m) {
     default:
       return '';
   }
+}
+
+Widget getTicketStatusWidget(Ticket ticket){
+  TextStyle style;
+  if(ticket.status.compareTo('pending')==0){
+    style = TextStyle(color: Colors.orange,fontSize: 16,fontWeight: FontWeight.w500);
+  }else if(ticket.status.compareTo('accepted')==0){
+    style = TextStyle(color: Colors.green,fontSize: 16,fontWeight: FontWeight.w500);
+  }else{
+    style = TextStyle(color: Colors.red,fontSize: 16,fontWeight: FontWeight.w500);
+  }
+  return Text('Status : ' + beautifyString(ticket.status),style: style,);
 }
 
 String toDateString(DateTime date) {
@@ -93,7 +141,7 @@ MaterialColor hexToMaterialColor(final String hexColor) {
 }
 
 MaterialColor getPrimaryColor() {
-  return hexToMaterialColor('#0DAC8E');
+  return Colors.indigo;
 }
 
 MaterialColor getAccentColor() {
